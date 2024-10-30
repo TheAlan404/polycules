@@ -1,0 +1,8 @@
+{
+    "name": "@app/common",
+    "version": "0.0.0-development",
+    "author": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {}
+}

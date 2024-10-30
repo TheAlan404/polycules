@@ -1,0 +1,18 @@
+{
+    "name": "app",
+    "version": "0.0.0-development",
+    "description": "",
+    "author": "",
+    "engines": {
+        "node": ">=18",
+        "pnpm": ">=7.5.1"
+    },
+    "devDependencies": {
+        "typescript": "^4.9.5"
+    },
+    "workspaces": [
+        "app/frontend",
+        "app/backend",
+        "app/common"
+    ]
+}

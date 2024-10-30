@@ -1,0 +1,20 @@
+{
+    "name": "@app/backend",
+    "version": "0.0.0-development",
+    "author": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "dev": "tsx watch src/index"
+    },
+    "dependencies": {
+        "@app/common": "workspace:*",
+        "cors": "^2.8.5",
+        "express": "^4.21.0"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/cors": "^2.8.17",
+        "tsx": "^4.19.1"
+    }
+}
