@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "lib": ["ES2022", "DOM"],
         /* Basic Options */
         "incremental": true,
         "declaration": true,
@@ -22,7 +23,7 @@
         "jsx": "react-jsx",
         "esModuleInterop": true,
         "paths": {
-            "@myddh/common": ["./app/common/src/index"]
+            "@app/common": ["./app/common/src/index"]
         },
     }
 }

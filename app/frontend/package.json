@@ -9,16 +9,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@alan404/react-workspace": "^0.0.2",
     "@app/common": "workspace:*",
-    "@mantine/hooks": "^7.12.2",
-    "@mantine/core": "^7.12.2",
     "@mantine/carousel": "^7.12.2",
+    "@mantine/core": "^7.12.2",
     "@mantine/dates": "^7.12.2",
     "@mantine/form": "^7.12.2",
+    "@mantine/hooks": "^7.12.2",
     "@mantine/modals": "^7.12.2",
     "@mantine/notifications": "^7.12.2",
     "@mantine/nprogress": "^7.12.2",
     "@tabler/icons-react": "^3.17.0",
+    "d3": "^7.9.0",
     "dayjs": "^1.11.13",
     "embla-carousel-react": "^8.3.0",
     "i18next": "^23.15.1",
@@ -29,6 +31,7 @@
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
+    "@types/d3": "^7.4.3",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",

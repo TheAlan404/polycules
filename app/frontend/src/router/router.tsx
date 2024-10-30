@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ErrorPage } from "./ErrorPage";
 import { AppBase } from "./base/AppBase";
 import { HomePage } from "./pages/home/HomePage";
+import { PolyculePage } from "./pages/polycule/PolyculePage";
 
 const router = createBrowserRouter([
     {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
                     {
                         index: true,
                         element: <HomePage />,
+                    },
+                    {
+                        path: ":id",
+                        element: <PolyculePage />,
                     },
                 ],
             }

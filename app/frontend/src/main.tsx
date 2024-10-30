@@ -12,6 +12,7 @@ import '@mantine/carousel/styles.css';
 import './index.css'
 
 const theme = createTheme({
+    fontFamily: "Lexend-VariableFont",
 	components: {
         Tooltip: {
             defaultProps: {
@@ -27,7 +28,7 @@ const theme = createTheme({
 createRoot(document.getElementById('root')!).render(
 	<MantineProvider theme={theme} forceColorScheme="dark">
 		<Notifications />
-		<ModalsProvider>
+		<ModalsProvider labels={{ cancel: "Cancel", confirm: "Confirm" }}>
 			<I18nextProvider i18n={i18n} defaultNS={[]}>
 				<BaseRouter />
 			</I18nextProvider>

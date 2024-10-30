@@ -1,3 +1,29 @@
-.pixelated {
-    image-rendering: pixelated;
+@font-face {
+    font-family: "Lexend-VariableFont";
+    src:
+        local("Lexend-VariableFont"),
+        url("https://deniz.blue/assets/fonts/Lexend-VariableFont_wght.ttf");
+}
+
+.colored-paper::before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 6px;
+    top: var(--mantine-radius-md);
+    bottom: var(--mantine-radius-md);
+    inset-inline-start: 6px;
+    border-radius: var(--mantine-radius-md);
+    background-color: var(--color);
+}
+
+.person-select-system::before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 6px;
+    height: 100%;
+    inset-inline-start: -12px;
+    border-radius: var(--mantine-radius-md);
+    background-color: var(--color);
 }
