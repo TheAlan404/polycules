@@ -2,7 +2,7 @@ import { PolyculeSystem } from "@app/common";
 import { Button, Stack } from "@mantine/core";
 import { SystemCard } from "./SystemCard";
 import { IconPlus } from "@tabler/icons-react";
-import { randomId } from "@mantine/hooks";
+import { randId } from "../../utils";
 
 export const SystemsList = ({
     systems,
@@ -33,8 +33,8 @@ export const SystemsList = ({
                     fullWidth
                     color="gray"
                     onClick={() => setSystems([...systems, {
-                        id: randomId(),
-                        members: [{ id: randomId(), name: "New person" }],
+                        id: randId(),
+                        members: [{ id: randId(), name: "New person" }],
                     }])}
                 >
                     Add new person

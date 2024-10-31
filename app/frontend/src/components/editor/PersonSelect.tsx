@@ -73,7 +73,7 @@ export const PersonSelect = ({
                     }}
                 >
                     <Group gap={0}>
-                        <Text>{system.name}</Text>
+                        <Text>{system.name || "unnamed"}</Text>
                         {!pad && <Text c="dimmed">&</Text>}
                     </Group>
                 </Box>

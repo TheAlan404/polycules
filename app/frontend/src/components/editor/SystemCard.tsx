@@ -2,12 +2,9 @@ import { PolyculeSystem } from "@app/common";
 import { ActionIcon, ColorPicker, Group, Paper, Popover, Stack, Text, TextInput, Tooltip } from "@mantine/core";
 import { ColoredPaper } from "../ui/ColoredPaper";
 import { PersonCard } from "./PersonCard";
-import { useState } from "react";
 import { TextEditable } from "../ui/TextEditable";
-import { randomId } from "@mantine/hooks";
-import { modals } from "@mantine/modals";
 import { IconPalette, IconTrash, IconUsersPlus } from "@tabler/icons-react";
-import { onClickDelete } from "../../utils";
+import { onClickDelete, randId } from "../../utils";
 
 export const SystemCard = ({
     system,
@@ -35,7 +32,7 @@ export const SystemCard = ({
                     ...system,
                     members: [
                         ...system.members,
-                        { id: randomId(), name: "New headmate" },
+                        { id: randId(), name: "New headmate" },
                     ],
                 });
             })}
@@ -93,7 +90,7 @@ export const SystemCard = ({
                                         ...system,
                                         members: [
                                             ...system.members,
-                                            { id: randomId(), name: "New headmate", color: system.color },
+                                            { id: randId(), name: "New headmate", color: system.color },
                                         ],
                                     })}
                                 >
