@@ -21,5 +21,3 @@ export type PolyculeRelationship = {
     b: string;
     label?: string;
 };
-
-

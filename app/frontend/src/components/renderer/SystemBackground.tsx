@@ -1,6 +1,7 @@
 import { TransformProvider } from "@alan404/react-workspace";
 import { PolyculeSystem } from "@app/common";
 import { GraphNode, avgPos } from "./types";
+import { Text } from "@mantine/core";
 
 export const SystemBackground = ({
     system, nodes,
@@ -29,7 +30,21 @@ export const SystemBackground = ({
                     height: radius * 2,
                     backgroundColor: (system.color || "#aaaaaa") + "66",
                     borderRadius: radius,
-                }} />
+                }}
+            />
+            <Text
+                fz="sm"
+                ta="center"
+                style={{
+                    textWrap: "nowrap",
+                    position: "absolute",
+                    top: `${radius*2}px`,
+                    width: `${radius*2}px`,
+                    userSelect: "none",
+                }}
+            >
+                {system.name}&
+            </Text>
         </TransformProvider>
     );
 };

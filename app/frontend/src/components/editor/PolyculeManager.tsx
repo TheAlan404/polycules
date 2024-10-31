@@ -1,8 +1,10 @@
-import { Stack, Title } from "@mantine/core";
+import { JsonInput, Stack, TextInput, Title } from "@mantine/core";
 import { SystemsList } from "./SystemsList";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { PolyculeContext } from "../context/PolyculeContext";
 import { RelationshipsList } from "./RelationshipsList";
+import { FromDot } from "./data/FromDot";
+import { FromEs } from "./data/FromPolycules";
 
 export const PolyculeManager = () => {
     const { polycule, setPolycule } = useContext(PolyculeContext);
@@ -19,7 +21,7 @@ export const PolyculeManager = () => {
                 }))}
             />
 
-            <Title order={2}>Relationships</Title>
+            {/* <Title order={2}>Relationships</Title> */}
 
             <RelationshipsList
                 relationships={polycule.relationships}
@@ -27,6 +29,13 @@ export const PolyculeManager = () => {
                     ...polycule,
                     relationships,
                 }))}
+            />
+
+            <Title order={2}>Import/Export</Title>
+
+            <JsonInput
+                value={JSON.stringify(polycule)}
+                onChange={(e) => setPolycule?.(JSON.parse(e))}
             />
         </Stack>
     )

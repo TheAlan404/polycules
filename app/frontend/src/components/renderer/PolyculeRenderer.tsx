@@ -38,7 +38,7 @@ export const PolyculeRenderer = () => {
         links: d3.SimulationLinkDatum<GraphNode>[];
     }>({ nodes: [], links: [] });
 
-    const { props, isPanning } = usePanning();
+    const { ref, isPanning } = usePanning<HTMLDivElement>();
 
     const relationshipsForce = useRef(useMemo(() => (
         d3.forceLink<GraphNode, GraphLink>()
@@ -58,8 +58,8 @@ export const PolyculeRenderer = () => {
                 .force("relationships", relationshipsForce.current)
                 .force("headmates", headmatesForce.current)
                 .force("charge", d3.forceManyBody<GraphNode>()
-                    .strength((node) => node.type == "system" ? 0 : -30))
-                .force("colission", d3.forceCollide<GraphNode>((node) => node.type == "member" ? 40 : 0))
+                    .strength((node) => node.type == "system" ? 0 : -50))
+                //.force("colission", d3.forceCollide<GraphNode>((node) => node.type == "member" ? 20 : 0))
                 .force("center", d3.forceCenter())
                 .force("system", createSystemsForce())
         ), [])
@@ -124,11 +124,23 @@ export const PolyculeRenderer = () => {
         sim.current.nodes(nodes);
         relationshipsForce.current.links(relationshipLinks);
         headmatesForce.current.links(headmateLinks);
+        console.log("Simulation updated");
+        rerender();
     }, [polycule]);
+
+    const rerender = () => {
+        sim.current.alphaTarget(1);
+        sim.current.restart();
+        setRendered({
+            nodes: sim.current!.nodes(),
+            links: relationshipsForce.current!.links(),
+        });
+    };
 
     const systemLinks = links.filter(x => (
         (x.source as GraphNode).type == "system" || (x.target as GraphNode).type == "system"
     ))
+    
     const nonSystemLinks = links.filter(x => (
         (x.source as GraphNode).type == "member" && (x.target as GraphNode).type == "member"
     ))
@@ -140,8 +152,9 @@ export const PolyculeRenderer = () => {
             pos="relative"
             style={{
                 cursor: isPanning ? "grabbing" : "auto",
+                touchAction: "manipulation",
             }}
-            {...props}
+            ref={ref}
         >
             <Links
                 links={systemLinks}
@@ -178,14 +191,17 @@ export const PolyculeRenderer = () => {
                             onDrag={({ x, y }) => {
                                 let node = nodes.find(x => x.id == `${system.id}-${member.id}`);
                                 if(!node) return;
-                                node.x = x;
-                                node.y = y;
-                                sim.current.alphaTarget(1);
-                                sim.current.restart();
-                                setRendered({
-                                    nodes: sim.current!.nodes(),
-                                    links: relationshipsForce.current!.links(),
-                                });
+                                node.fx = x;
+                                node.fy = y;
+                                rerender();
+                            }}
+                            onDragEnd={() => {
+                                let node = nodes.find(x => x.id == `${system.id}-${member.id}`);
+                                if(!node) return;
+                                let i = nodes.indexOf(node);
+                                nodes[i].fx = null;
+                                nodes[i].fy = null;
+                                rerender();
                             }}
                         />
                     ))

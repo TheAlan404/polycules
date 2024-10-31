@@ -19,10 +19,12 @@ export const PolyculePage = () => {
     const [opened, { open, close }] = useDisclosure(false);
 
 
-    const [polycule, setPolycule] = useState<Polycule>({
-        systems: [],
-        relationships: []
-    });
+    const [polycule, setPolycule] = useState<Polycule>(
+
+        {"systems":[{"id":"poaqg48dq0g","members":[{"id":"rr9jrr420y","name":"cyan","color":"#c1d929"},{"id":"fubueschn3o","name":"carmine","color":"#e64980"}],"name":"bismuth","color":"#40c057"},{"id":"4wp7246jq2u","members":[{"id":"26voktfdld5","name":"güz","color":"#fab005"},{"id":"hvpwniu47qh","name":"lily","color":"#1f6aab"}],"name":"ath"},{"id":"wi3ntogle1","members":[{"id":"emz0rbtf5be","name":"siya","color":"#be4bdb"}]},{"id":"c7aru6h2ti","members":[{"id":"y8h9vbl9bn","name":"emma","color":"#9e41b5"}]},{"id":"fwdzk13uwa9","members":[{"id":"xynqw6e3wwd","name":"evie","color":"#f56ed1"}]}],"relationships":[{"a":"poaqg48dq0g-rr9jrr420y","b":"4wp7246jq2u"},{"a":"poaqg48dq0g-fubueschn3o","b":"wi3ntogle1-emz0rbtf5be"},{"a":"poaqg48dq0g-fubueschn3o","b":"c7aru6h2ti-y8h9vbl9bn"},{"a":"fwdzk13uwa9-xynqw6e3wwd","b":"c7aru6h2ti-y8h9vbl9bn"}]}
+
+
+    );
 
 
     return (
