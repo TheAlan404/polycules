@@ -42,9 +42,12 @@ export const SystemMember = ({
                 <Avatar
                     name={node.label}
                     color={node.color}
-                    variant={isDragging ? "light" : "filled"}
+                    variant={"filled"}
                     style={{
                         touchAction: "manipulation",
+                        cursor: isDragging ? "grabbing" : "grab",
+                        outline: isDragging ? "solid var(--mantine-color-blue-outline)" : "",
+                        outlineOffset: "4px",
                     }}
                     ref={ref}
                 />

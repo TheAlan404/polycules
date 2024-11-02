@@ -3,7 +3,15 @@
     "include": [
         "src/**/*"
     ],
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true
+    "references": [{ "path": "../common" }],
+    "compilerOptions": {
+      "noEmit": true,
+      "rootDir": "./src",
+      "target": "ESNext",
+      "module": "ESNext",
+      "moduleResolution": "Bundler",
+      "esModuleInterop": true,
+      "allowArbitraryExtensions": true,
+      "allowImportingTsExtensions": true
   }
 }

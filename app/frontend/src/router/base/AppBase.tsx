@@ -7,26 +7,23 @@ export const AppBase = () => {
 
     return (
         <AppShell
-            header={{ height: 60 }}
+            header={{ height: 0 }}
             navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true, mobile: !opened } }}
         >
-            <AppShell.Header>
+            {/* <AppShell.Header>
                 <Group h="100%" px="xs">
                     <Group w="100%" justify="space-between" wrap="nowrap">
                         <Group wrap="nowrap">
                             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
 
-                            {/* Left of header */}
                         </Group>
 
-                        {/* Right of header */}
                     </Group>
                 </Group>
             </AppShell.Header>
 
             <AppShell.Navbar>
-                {/* Navbar */}
-            </AppShell.Navbar>
+            </AppShell.Navbar> */}
 
 
             <AppShell.Main>

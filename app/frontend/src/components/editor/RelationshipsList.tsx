@@ -1,59 +1,67 @@
 import { PolyculeRelationship } from "@app/common"
-import { Button, Paper, Stack } from "@mantine/core";
+import { Button, Group, Paper, Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { RelationshipCard } from "./RelationshipCard";
-import { useState } from "react";
+import { useContext, useMemo, useState } from "react";
+import { PolyculeContext } from "../context/PolyculeContext";
 
 export const RelationshipsList = ({
-    relationships,
-    setRelationships,
+    id,
 }: {
-    relationships: PolyculeRelationship[];
-    setRelationships?: (v: PolyculeRelationship[]) => void;
+    id: string;
 }) => {
-    const [add, setAdd] = useState<PolyculeRelationship>({
-        a: "",
-        b: "",
-    });
+    const { polycule, setPolycule } = useContext(PolyculeContext);
+
+    const relationships = useMemo(() => (
+        polycule.relationships
+            .map((x,i) => [x, i] as [PolyculeRelationship, number])
+            .filter(([x, i]) => x.a == id || x.b == id)
+    ), [polycule.relationships]);
 
     return (
-        <Stack py="md">
-            {relationships.map((relationship, i) => (
+        <Stack>
+            {relationships.map(([relationship, idx]) => (
                 <RelationshipCard
+                    id={id}
                     key={relationship.a + ";" + relationship.b}
                     relationship={relationship}
-                    setRelationship={setRelationships && ((rel) => {
-                        setRelationships(relationships.map((x, ii) => i === ii ? rel : x));
+                    setRelationship={setPolycule && ((rel) => {
+                        setPolycule({
+                            ...polycule,
+                            relationships: polycule.relationships
+                                .map((x, i) => i === idx ? rel : x)
+                        });
                     })}
-                    onDelete={setRelationships && (() => {
-                        setRelationships(relationships.filter((x, ii) => i !== ii));
+                    onDelete={setPolycule && (() => {
+                        setPolycule({
+                            ...polycule,
+                            relationships: polycule.relationships
+                                .filter((_, i) => i !== idx)
+                        });
                     })}
                 />
             ))}
 
-            {setRelationships && (
-                <Paper withBorder p="md">
-                    <Stack>
-                        <RelationshipCard
-                            relationship={add}
-                            setRelationship={setAdd}
-                        />
-                        
-                        <Button
-                            variant="light"
-                            leftSection={<IconPlus />}
-                            fullWidth
-                            color="gray"
-                            disabled={!add.a || !add.b}
-                            onClick={() => setRelationships([
-                                ...relationships,
-                                { ...add }
-                            ])}
-                        >
-                            Add a new relationship
-                        </Button>
-                    </Stack>
-                </Paper>
+            {setPolycule && (
+                <Group>
+                    <Button
+                        variant="subtle"
+                        color="gray"
+                        c="dimmed"
+                        leftSection={<IconPlus />}
+                        onClick={() => {
+                            setPolycule({
+                                ...polycule,
+                                relationships: [
+                                    ...polycule.relationships,
+                                    { a: id, b: "" },
+                                ],
+                            });
+                        }}
+                    >
+                        Add a {id.includes("-") ? "" : "system"} relationship
+                    </Button>
+                </Group>
             )}
         </Stack>
     )

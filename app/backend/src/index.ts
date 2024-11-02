@@ -1,11 +1,78 @@
 import express from 'express';
 import cors from 'cors';
+import { existsSync } from "node:fs";
+import { ADDR, DIST_FOLDER, PORT } from "./config";
+import { db, PolyculeEntry } from "./db";
+import { v4, validate } from "uuid";
 
 const app = express();
-const port = 3000;
 
 app.use(cors());
+app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`Server started at port ${port}`);
+if (existsSync(DIST_FOLDER)) {
+	app.use(express.static(DIST_FOLDER));
+};
+
+app.get("/api/polycules/:id", async (req, res) => {
+	let { id } = req.params;
+	let { viewPassword } = req.query;
+
+	if(!validate(id)) return res.status(400).json({ error: "Invalid UUID" });
+
+	let cule = await db.getPolycule(id);
+	if(!cule) return res.status(404).json({ error: "Not found" });
+
+	if(cule.viewPassword && viewPassword !== cule.viewPassword)
+		return res.status(401).json({ error: "Wrong password" });
+
+	res.json(cule.polycule);
+});
+
+app.get("/api/polycules/:id/passwordCheck", async (req, res) => {
+	let { id } = req.params;
+	let { editPassword } = req.query;
+	if(!validate(id)) return res.status(400).json({ error: "Invalid UUID" });
+	let cule = await db.getPolycule(id);
+	if(!cule) return res.status(404).json({ error: "Not found" });
+	res.json(!cule.editPassword || (editPassword === cule.editPassword));
+});
+
+app.post("/api/polycules/:id", async (req, res) => {
+	let { id } = req.params;
+	let {
+		editPassword,
+		setEditPassword,
+		setViewPassword,
+	} = req.query;
+	let editedCule = req.body;
+
+	let isNew = id == "new";
+	if(id == "new") id = v4();
+	if(!validate(id)) return res.status(400).json({ error: "Invalid UUID" });
+
+	let cule: PolyculeEntry | null = null;
+	if(!isNew) {
+		cule = await db.getPolycule(id);
+		if(!cule) return res.status(404).json({ error: "Not found" });
+	
+		if(cule.editPassword && editPassword !== cule.editPassword)
+			return res.status(401).json({ error: "Wrong password" });
+	}
+
+	await db.setPolycule(id, {
+		polycule: editedCule,
+		editPassword: typeof setEditPassword == "string" ? setEditPassword : cule?.editPassword,
+		viewPassword: typeof setViewPassword == "string" ? setViewPassword : cule?.viewPassword,
+	});
+
+	if(isNew) {
+		res.json({ id });
+	} else {
+		res.json({});
+	}
+});
+
+app.listen(PORT, () => {
+	console.log(`Server started at ${PORT}`);
 });

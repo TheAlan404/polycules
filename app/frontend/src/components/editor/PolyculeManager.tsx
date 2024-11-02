@@ -1,18 +1,34 @@
-import { JsonInput, Stack, TextInput, Title } from "@mantine/core";
+import { JsonInput, Stack, Text, TextInput, Title } from "@mantine/core";
 import { SystemsList } from "./SystemsList";
-import { useContext, useState } from "react";
+import { PropsWithChildren, useContext, useState } from "react";
 import { PolyculeContext } from "../context/PolyculeContext";
-import { RelationshipsList } from "./RelationshipsList";
-import { FromDot } from "./data/FromDot";
-import { FromEs } from "./data/FromPolycules";
 
-export const PolyculeManager = () => {
+export const PolyculeManager = ({
+    children
+}: PropsWithChildren) => {
     const { polycule, setPolycule } = useContext(PolyculeContext);
 
+    let singletCount = 0;
+    let systemCount = 0;
+    let peopleCount = 0;
+    for(let system of polycule.systems) {
+        if(system.members.length == 1) {
+            singletCount++;
+            peopleCount++;
+            continue;
+        }
+        systemCount++;
+        peopleCount += system.members.length;
+    }
+
+    const p = (x: number) => x == 1 ? "" : "s";
+
     return (
-        <Stack>
-            <Title order={2}>Members</Title>
-            
+        <Stack pb="xl">
+            <Text c="dimmed">
+                {peopleCount} people; {singletCount} singlet{p(singletCount)} and {systemCount} system{p(systemCount)} - {polycule.relationships.length} relationships total
+            </Text>
+
             <SystemsList
                 systems={polycule.systems}
                 setSystems={setPolycule && ((systems) => setPolycule({
@@ -21,22 +37,7 @@ export const PolyculeManager = () => {
                 }))}
             />
 
-            {/* <Title order={2}>Relationships</Title> */}
-
-            <RelationshipsList
-                relationships={polycule.relationships}
-                setRelationships={setPolycule && ((relationships) => setPolycule({
-                    ...polycule,
-                    relationships,
-                }))}
-            />
-
-            <Title order={2}>Import/Export</Title>
-
-            <JsonInput
-                value={JSON.stringify(polycule)}
-                onChange={(e) => setPolycule?.(JSON.parse(e))}
-            />
+            {children}
         </Stack>
     )
 };

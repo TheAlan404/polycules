@@ -1,14 +1,15 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import { PolyculeContext } from "../context/PolyculeContext";
-import { BackgroundGrid, GlobalTransformProvider, Position, useGlobalTransform, usePanning, WorkspaceView } from "@alan404/react-workspace";
-import { Paper, Text } from "@mantine/core";
+import { BackgroundGrid, GlobalTransformProvider, Position, useGlobalTransform, useMousePosition, usePanning, WorkspaceView } from "@alan404/react-workspace";
+import { ActionIcon, Box, Button, Group, Paper, Text } from "@mantine/core";
 import { useThrottledState } from "@mantine/hooks";
 import { View } from "./View";
 import { SystemBackground } from "./SystemBackground";
 import { SystemMember } from "./SystemMember";
 import { Links } from "./Links";
-import { avgPos, GraphLink, GraphNode } from "./types";
+import { avgPos, GraphLink, GraphNode, RenderedLink, vec2 } from "./types";
+import { IconCrosshair } from "@tabler/icons-react";
 
 const createSystemsForce = () => {
     let nodes: GraphNode[] = [];
@@ -79,26 +80,38 @@ export const PolyculeRenderer = () => {
     }, []);
 
     useEffect(() => {
-        const nodes: GraphNode[] = [];
+        const graphNodes: GraphNode[] = [];
         const headmateLinks: GraphLink[] = [];
         const relationshipLinks: GraphLink[] = [];
 
         for (let system of polycule.systems) {
-            nodes.push({
+            let existingNode = nodes.find(x => x.type == "system" && x.id == system.id);
+
+            graphNodes.push({
                 id: system.id,
                 type: "system",
                 color: system.color || "#ffffff",
                 label: system.name || "",
+                x: existingNode?.x,
+                vx: existingNode?.vx,
+                y: existingNode?.y,
+                vy: existingNode?.vy,
             })
 
             for (let member of system.members) {
                 const memberId = `${system.id}-${member.id}`;
 
-                nodes.push({
+                let existingNode = nodes.find(x => x.type == "member" && x.id == memberId);
+
+                graphNodes.push({
                     id: memberId,
                     type: "member",
                     color: member.color || system.color || "#ffffff",
                     label: member.name,
+                    x: existingNode?.x,
+                    vx: existingNode?.vx,
+                    y: existingNode?.y,
+                    vy: existingNode?.vy,
                 });
 
                 for (let headmate of system.members) {
@@ -114,14 +127,16 @@ export const PolyculeRenderer = () => {
             }
         }
 
+        const existingIds = new Set(graphNodes.map(x => x.id));
         for (let relationship of polycule.relationships) {
+            if(!existingIds.has(relationship.a) || !existingIds.has(relationship.b)) continue;
             relationshipLinks.push({
                 source: relationship.a,
                 target: relationship.b,
             });
         }
 
-        sim.current.nodes(nodes);
+        sim.current.nodes(graphNodes);
         relationshipsForce.current.links(relationshipLinks);
         headmatesForce.current.links(headmateLinks);
         console.log("Simulation updated");
@@ -137,17 +152,60 @@ export const PolyculeRenderer = () => {
         });
     };
 
-    const systemLinks = links.filter(x => (
-        (x.source as GraphNode).type == "system" || (x.target as GraphNode).type == "system"
-    ))
-    
-    const nonSystemLinks = links.filter(x => (
-        (x.source as GraphNode).type == "member" && (x.target as GraphNode).type == "member"
-    ))
+    const bothSystemLinks: RenderedLink[] = [];
+    const eitherSystemLinks: RenderedLink[] = [];
+    const bothMemberLinks: RenderedLink[] = [];
+
+    const systemRadiuses: Record<string, number> = {};
+    for(let node of nodes) {
+        if(node.type == "member") continue;
+        let members = nodes.filter(x => x.type == "member" && x.id.split("-")[0] == node.id);
+        systemRadiuses[node.id] = Math.sqrt(Math.max(...members.map(x => (
+            ((x.x || 0) - (node.x || 0)) ** 2 + ((x.y || 0) - (node.y || 0)) ** 2
+        )))) + 40
+    }
+
+    for(let link of links) {
+        let source = (link.source as GraphNode);
+        let target = (link.target as GraphNode);
+
+        if(source.type == "system" && target.type == "system") {
+            //bothSystemLinks.push(link);
+            bothSystemLinks.push({
+                a: vec2(source),
+                b: vec2(target),
+            });
+        } else if(source.type == "member" && target.type == "member") {
+            //bothMemberLinks.push(link);
+            bothMemberLinks.push({
+                a: vec2(source),
+                b: vec2(target),
+            });
+        } else {
+            //eitherSystemLinks.push(link);
+
+            let member = source.type == "member" ? source : target;
+            let system = source.type == "system" ? source : target;
+
+            let r = systemRadiuses[system.id];
+            let ang = Math.atan2(
+                (system.y || 0) - (member.y || 0),
+                (system.x || 0) - (member.x || 0),
+            );
+            
+            eitherSystemLinks.push({
+                a: vec2(member),
+                b: vec2(
+                    (system.x || 0) - Math.cos(ang) * r,
+                    (system.y || 0) - Math.sin(ang) * r,
+                ),
+                color: system.color,
+            });
+        }
+    }
 
     return (
         <Paper
-            withBorder
             h="100%"
             pos="relative"
             style={{
@@ -156,9 +214,13 @@ export const PolyculeRenderer = () => {
             }}
             ref={ref}
         >
+            <div className="bugfix">
+                <BackgroundGrid
+                />
+            </div>
+
             <Links
-                links={systemLinks}
-                nodes={nodes}
+                links={bothSystemLinks}
                 stroke="var(--mantine-color-gray-filled)"
                 strokeWidth={8}
             />
@@ -166,16 +228,22 @@ export const PolyculeRenderer = () => {
             <View>
                 {polycule.systems.map(system => (
                     <SystemBackground
-                        nodes={nodes}
                         system={system}
+                        radius={systemRadiuses[system.id]}
+                        position={vec2(nodes.find(x => x.id == system.id))}
                         key={system.id}
                     />
                 ))}
             </View>
 
             <Links
-                links={nonSystemLinks}
-                nodes={nodes}
+                links={bothMemberLinks}
+                stroke="var(--mantine-color-gray-filled)"
+                strokeWidth={8}
+            />
+
+            <Links
+                links={eitherSystemLinks}
                 stroke="var(--mantine-color-gray-filled)"
                 strokeWidth={8}
             />
@@ -207,8 +275,33 @@ export const PolyculeRenderer = () => {
                     ))
                 ))}
             </View>
+
+            <PositionOverlay />
         </Paper>
     )
 };
 
+export const PositionOverlay = () => {
+    const { position, scale, reset } = useGlobalTransform();
+    const mouse = useMousePosition();
 
+    return (
+        <Box w="100%" style={{ position: "fixed", bottom: 0 }}>
+            <Group justify="center" pb="xs">
+                <Text c="dimmed" ta="center" fz="sm">
+                    ({position.x}, {position.y}) {scale.toString().slice(0, 3)}x
+                    <br />
+                    Mouse: ({mouse.x}, {mouse.y})
+                </Text>
+
+                <ActionIcon
+                    variant="light"
+                    color="dark"
+                    onClick={reset}
+                >
+                    <IconCrosshair />
+                </ActionIcon>
+            </Group>
+        </Box>
+    )
+}

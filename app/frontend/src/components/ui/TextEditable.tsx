@@ -1,4 +1,4 @@
-import { ActionIcon, Group, PolymorphicComponentProps, Text, TextInput, TextProps } from "@mantine/core";
+import { ActionIcon, Group, PolymorphicComponentProps, Text, TextInput, TextProps, Tooltip } from "@mantine/core";
 import { IconCheck, IconPencil } from "@tabler/icons-react";
 import { ReactNode, useState } from "react";
 
@@ -6,11 +6,15 @@ export const TextEditable = ({
     value,
     displayValue,
     onChange,
+    icon,
+    tooltip,
     ...props
 }: {
     value: string;
     displayValue?: ReactNode;
     onChange?: (value: string) => void;
+    icon?: React.ReactNode;
+    tooltip?: React.ReactNode;
 } & Omit<PolymorphicComponentProps<"p", TextProps>, "value" | "onChange">) => {
     const [editing, setEditing] = useState(false);
 
@@ -24,6 +28,7 @@ export const TextEditable = ({
                     onKeyDown={(e) => {
                         if(e.key == "Enter" || e.key == "Esc") setEditing(false);
                     }}
+                    onBlur={() => setEditing(false)}
                 />
             ) : (
                 displayValue || (
@@ -35,22 +40,19 @@ export const TextEditable = ({
 
             {onChange && (
                 editing ? (
-                    <ActionIcon
-                        variant="light"
-                        color="green"
-                        onClick={() => setEditing(false)}
-                    >
-                        <IconCheck />
-                    </ActionIcon>
+                    <></>
                 ) : (
-                    <ActionIcon
-                        variant="transparent"
-                        c="dimmed"
-                        onClick={() => setEditing(true)}
-                        size="sm"
-                    >
-                        <IconPencil />
-                    </ActionIcon>
+                    <Tooltip label={tooltip} disabled={!tooltip}>
+                        <ActionIcon
+                            variant="subtle"
+                            color="gray"
+                            c="dimmed"
+                            onClick={() => setEditing(true)}
+                            size="sm"
+                        >
+                            {icon || <IconPencil />}
+                        </ActionIcon>
+                    </Tooltip>
                 )
             )}
         </Group>

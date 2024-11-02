@@ -5,6 +5,19 @@
         url("https://deniz.blue/assets/fonts/Lexend-VariableFont_wght.ttf");
 }
 
+.hoverable:hover {
+    background-color: var(--mantine-color-gray-light-hover) !important;
+}
+
+.chevron {
+    transition: transform 200ms ease;
+    transform: rotate(0deg);
+}
+
+.mantine-Accordion-item[data-active="true"] .chevron {
+    transform: rotate(180deg);
+}
+
 .colored-paper::before {
     content: "";
     display: block;
@@ -26,4 +39,8 @@
     inset-inline-start: -12px;
     border-radius: var(--mantine-radius-md);
     background-color: var(--color);
+}
+
+.bugfix div {
+    z-index: unset !important;
 }
