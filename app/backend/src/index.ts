@@ -5,6 +5,7 @@ import { ADDR, DIST_FOLDER, PORT } from "./config";
 import { db, PolyculeEntry } from "./db";
 import { v4, validate } from "uuid";
 import { SpecialPolycules } from "./special";
+import path from "node:path";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 if (existsSync(DIST_FOLDER)) {
+	console.log("Serving: ", DIST_FOLDER);
 	app.use(express.static(DIST_FOLDER));
 };
 
@@ -20,7 +22,7 @@ app.get("/api/polycules/:id", async (req, res) => {
 	let { viewPassword } = req.query;
 
 	if(SpecialPolycules.has(id)) {
-		return res.json(SpecialPolycules.get(id)!());
+		return res.json(await SpecialPolycules.get(id)!());
 	}
 
 	if(!validate(id)) return res.status(400).json({ error: "Invalid UUID" });
@@ -36,7 +38,7 @@ app.get("/api/polycules/:id", async (req, res) => {
 
 app.get("/api/polycules/:id/passwordCheck", async (req, res) => {
 	let { id } = req.params;
-	if(SpecialPolycules.has(id)) return res.json(false);
+	if(SpecialPolycules.has(id)) return res.json({ error: "Not editable" });
 	let { editPassword } = req.query;
 	if(!validate(id)) return res.status(400).json({ error: "Invalid UUID" });
 	let cule = await db.getPolycule(id);
@@ -79,6 +81,10 @@ app.post("/api/polycules/:id", async (req, res) => {
 	} else {
 		res.json({});
 	}
+});
+
+app.get("*", (req, res) => {
+	res.sendFile(path.resolve(DIST_FOLDER, "index.html"));
 });
 
 app.listen(PORT, () => {

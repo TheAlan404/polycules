@@ -24,4 +24,5 @@ export const db = {
         poly.lastUpdated = Date.now();
         d.polycules[id] = poly;
     }),
+    getAllPublic: async () => Object.entries(low.data.polycules).filter(([_, x]) => x.polycule.public),
 };

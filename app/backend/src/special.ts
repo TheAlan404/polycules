@@ -1,4 +1,5 @@
 import { Polycule, PolyculePerson, PolyculeRelationship, PolyculeSystem } from "@app/common";
+import { db } from "./db";
 
 export const randId = () => Math.random().toString(36).slice(2);
 
@@ -23,8 +24,8 @@ const rel = (a: { id: string } | string, b: { id: string } | string, label?: str
     label,
 });
 
-export const SpecialPolycules: Map<string, () => Polycule> = new Map([
-	["default", () => {
+export const SpecialPolycules: Map<string, () => Promise<Polycule>> = new Map([
+	["default", async () => {
         let john = member("John", "#008dea");
         let michael = member("Michael", "#3f2d8d");
 		let sys1 = {
@@ -57,4 +58,53 @@ export const SpecialPolycules: Map<string, () => Polycule> = new Map([
 			],
 		};
 	}],
+
+    ["all", async () => {
+        let usedSystemIds = new Set<string>();
+
+        let systems: PolyculeSystem[] = [];
+        let relationships: PolyculeRelationship[] = [];
+
+        for(let [id, { polycule }] of await db.getAllPublic()) {
+            let realSystemIdMap = new Map<string, string>();
+            const realSystemId = (id: string) => {
+                if(realSystemIdMap.has(id)) return realSystemIdMap.get(id)!;
+                if(usedSystemIds.has(id)) {
+                    let newId = randId();
+                    realSystemIdMap.set(id, newId);
+                    return newId;
+                } else {
+                    realSystemIdMap.set(id, id);
+                    return id;
+                }
+            };
+
+            for(let system of polycule.systems) {
+                systems.push({
+                    id: realSystemId(system.id),
+                    members: system.members,
+                    color: system.color,
+                    name: system.name,
+                });
+            }
+
+            const realId = (id: string) => id.includes("-") ? (
+                `${realSystemId(id.split("-")[0])}-${id.split("-")[1]}`
+            ) : (
+                realSystemId(id)
+            );
+            for(let rel of polycule.relationships) {
+                relationships.push({
+                    a: realId(rel.a),
+                    b: realId(rel.b),
+                    label: rel.label,
+                });
+            }
+        }
+
+        return {
+            relationships,
+            systems,
+        };
+    }],
 ]);

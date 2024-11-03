@@ -6,7 +6,8 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "dev": "tsx watch src/index"
+        "dev": "tsx watch src/index",
+        "run": "tsx src/index"
     },
     "dependencies": {
         "@app/common": "workspace:*",
