@@ -1,6 +1,7 @@
 export type Polycule = {
     systems: PolyculeSystem[];
     relationships: PolyculeRelationship[];
+    public?: boolean;
 };
 
 export type PolyculeSystem = {

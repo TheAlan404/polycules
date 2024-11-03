@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { ADDR, DIST_FOLDER, PORT } from "./config";
 import { db, PolyculeEntry } from "./db";
 import { v4, validate } from "uuid";
+import { SpecialPolycules } from "./special";
 
 const app = express();
 
@@ -18,6 +19,10 @@ app.get("/api/polycules/:id", async (req, res) => {
 	let { id } = req.params;
 	let { viewPassword } = req.query;
 
+	if(SpecialPolycules.has(id)) {
+		return res.json(SpecialPolycules.get(id)!());
+	}
+
 	if(!validate(id)) return res.status(400).json({ error: "Invalid UUID" });
 
 	let cule = await db.getPolycule(id);
@@ -31,6 +36,7 @@ app.get("/api/polycules/:id", async (req, res) => {
 
 app.get("/api/polycules/:id/passwordCheck", async (req, res) => {
 	let { id } = req.params;
+	if(SpecialPolycules.has(id)) return res.json(false);
 	let { editPassword } = req.query;
 	if(!validate(id)) return res.status(400).json({ error: "Invalid UUID" });
 	let cule = await db.getPolycule(id);
@@ -46,6 +52,8 @@ app.post("/api/polycules/:id", async (req, res) => {
 		setViewPassword,
 	} = req.query;
 	let editedCule = req.body;
+
+	if(SpecialPolycules.has(id)) return res.json({ error: "Not updateable" });
 
 	let isNew = id == "new";
 	if(id == "new") id = v4();
