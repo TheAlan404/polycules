@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@alan404/react-workspace": "^0.0.8",
+    "@alan404/react-workspace": "^0.1.0",
     "@app/common": "workspace:*",
     "@mantine/carousel": "^7.12.2",
     "@mantine/core": "^7.12.2",

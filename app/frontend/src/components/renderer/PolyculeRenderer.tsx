@@ -1,10 +1,8 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import { PolyculeContext } from "../context/PolyculeContext";
-import { BackgroundGrid, GlobalTransformProvider, Position, useGlobalTransform, useMousePosition, usePanning, WorkspaceView } from "@alan404/react-workspace";
+import { BackgroundGrid, GlobalTransformProvider, Position, useGlobalTransform, useMousePosition, usePanning, useScaling, vec2round, WorkspaceView } from "@alan404/react-workspace";
 import { ActionIcon, Box, Button, Group, Paper, Text } from "@mantine/core";
-import { useThrottledState } from "@mantine/hooks";
-import { View } from "./View";
 import { SystemBackground } from "./SystemBackground";
 import { SystemMember } from "./SystemMember";
 import { Links } from "./Links";
@@ -39,7 +37,10 @@ export const PolyculeRenderer = () => {
         links: d3.SimulationLinkDatum<GraphNode>[];
     }>({ nodes: [], links: [] });
 
-    const { ref, isPanning } = usePanning<HTMLDivElement>();
+    const ref = useRef<HTMLDivElement | null>(null);
+
+    const isPanning = usePanning(ref);
+    useScaling(ref);
 
     const relationshipsForce = useRef(useMemo(() => (
         d3.forceLink<GraphNode, GraphLink>()
@@ -225,7 +226,7 @@ export const PolyculeRenderer = () => {
                 strokeWidth={8}
             />
 
-            <View>
+            <WorkspaceView>
                 {polycule.systems.map(system => (
                     <SystemBackground
                         system={system}
@@ -234,7 +235,7 @@ export const PolyculeRenderer = () => {
                         key={system.id}
                     />
                 ))}
-            </View>
+            </WorkspaceView>
 
             <Links
                 links={bothMemberLinks}
@@ -248,7 +249,7 @@ export const PolyculeRenderer = () => {
                 strokeWidth={8}
             />
 
-            <View>
+            <WorkspaceView>
                 {polycule.systems.map(system => (
                     system.members.map((member) => (
                         <SystemMember
@@ -274,7 +275,7 @@ export const PolyculeRenderer = () => {
                         />
                     ))
                 ))}
-            </View>
+            </WorkspaceView>
 
             <PositionOverlay />
         </Paper>
@@ -283,7 +284,7 @@ export const PolyculeRenderer = () => {
 
 export const PositionOverlay = () => {
     const { position, scale, reset } = useGlobalTransform();
-    const mouse = useMousePosition();
+    const mouse = vec2round(useMousePosition());
 
     return (
         <Box w="100%" style={{ position: "fixed", bottom: 0 }}>

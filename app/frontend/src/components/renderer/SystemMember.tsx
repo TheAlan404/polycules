@@ -1,7 +1,8 @@
-import { getMouseButtons, Position, TransformProvider, useGlobalTransform, useRelativeDrag } from "@alan404/react-workspace";
+import { getMouseButtons, Position, TransformProvider, useGlobalTransform, useRelativeDrag, vec2 } from "@alan404/react-workspace";
 import { PolyculeSystem, PolyculePerson } from "@app/common";
 import { Stack, Avatar, Text } from "@mantine/core";
 import { GraphNode } from "./types";
+import { useRef } from "react";
 
 export const SystemMember = ({
     system, member, nodes, onDrag, onDragEnd,
@@ -15,13 +16,11 @@ export const SystemMember = ({
     const memberId = `${system.id}-${member.id}`;
     const node = nodes.find(x => x.id == memberId);
 
-    const { ref, isDragging } = useRelativeDrag<HTMLDivElement>({
-        onChange: onDrag,
-        onChangeEnd: onDragEnd,
-        value: {
-            x: node?.x || 0,
-            y: node?.y || 0,
-        },
+    const ref = useRef<HTMLDivElement | null>(null);
+    const { isDragging } = useRelativeDrag(ref, {
+        onDrag,
+        onDragEnd,
+        position: vec2(node?.x, node?.y),
     });
 
 

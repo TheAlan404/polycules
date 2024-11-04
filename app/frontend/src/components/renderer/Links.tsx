@@ -25,7 +25,7 @@ export const Links = ({
                         y1={(link.a.y * scale + position.y)}
                         y2={(link.b.y * scale + position.y)}
                         stroke={link.color || props.stroke}
-                        strokeWidth={link.thickness || props.strokeWidth}
+                        strokeWidth={(link.thickness || props.strokeWidth || 0)}
                         {...props}
                     />
                 );
