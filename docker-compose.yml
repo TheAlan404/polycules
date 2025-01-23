@@ -1,16 +1,17 @@
 version: '3.8'
 
 services:
-  app:
+  polycules:
+    container_name: polycules
     build:
       context: .
+      dockerfile: Dockerfile
     ports:
-      - "3012:3012"
+      - 3012:3012
     environment:
       - PORT=3012
     volumes:
       - db-data:/app/backend/db.json
-    command: npm run run
 
 volumes:
   db-data:

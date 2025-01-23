@@ -1,22 +1,19 @@
-FROM node:20-slim AS base
+FROM node:22 AS builder
+
+WORKDIR /app
 RUN npm install -g pnpm
 
-FROM base AS build
-WORKDIR /
-COPY . app/
-WORKDIR /app/app/frontend
-RUN pnpm install
-RUN pnpm build
+COPY pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml ./
+COPY . ./
 
-FROM base
-WORKDIR /app
-COPY --from=build /app/package.json .
-COPY --from=build /app/pnpm-workspace.yaml .
-COPY --from=build /app/app/backend app/backend
-COPY --from=build /app/app/common app/common
-COPY --from=build /app/app/frontend/dist app/backend/
+RUN pnpm install --frozen-lockfile
+WORKDIR /app/app/frontend
+RUN pnpm build
+RUN mv /app/app/frontend/dist /app/app/backend/
 
 WORKDIR /app/app/backend
-RUN pnpm install
-EXPOSE 3000
-CMD ["pnpm", "run", "run"]
+ENV NODE_ENV=production
+ENV PORT=3012
+EXPOSE 3012
+CMD ["pnpx", "tsx", "./src/index.ts"]
