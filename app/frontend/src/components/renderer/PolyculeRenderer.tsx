@@ -1,13 +1,14 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import { PolyculeContext } from "../context/PolyculeContext";
-import { BackgroundGrid, GlobalTransformProvider, Position, useGlobalTransform, useMousePosition, usePanning, useScaling, vec2round, WorkspaceView } from "@alan404/react-workspace";
+import { BackgroundGrid, useGlobalTransform, useMousePosition, usePanning, WorkspaceView } from "@alan404/react-workspace";
 import { ActionIcon, Box, Button, Group, Paper, Text } from "@mantine/core";
 import { SystemBackground } from "./SystemBackground";
 import { SystemMember } from "./SystemMember";
 import { Links } from "./Links";
 import { avgPos, GraphLink, GraphNode, RenderedLink, vec2 } from "./types";
 import { IconCrosshair } from "@tabler/icons-react";
+import { vec2round } from "@alan404/vec2";
 
 const createSystemsForce = () => {
     let nodes: GraphNode[] = [];
@@ -37,10 +38,11 @@ export const PolyculeRenderer = () => {
         links: d3.SimulationLinkDatum<GraphNode>[];
     }>({ nodes: [], links: [] });
 
-    const ref = useRef<HTMLDivElement | null>(null);
-
-    const isPanning = usePanning(ref);
-    useScaling(ref);
+    const {
+        isPanning,
+        isScaling,
+        props,
+    } = usePanning();
 
     const relationshipsForce = useRef(useMemo(() => (
         d3.forceLink<GraphNode, GraphLink>()
@@ -213,7 +215,7 @@ export const PolyculeRenderer = () => {
                 cursor: isPanning ? "grabbing" : "auto",
                 touchAction: "manipulation",
             }}
-            ref={ref}
+            {...props}
         >
             <div className="bugfix">
                 <BackgroundGrid

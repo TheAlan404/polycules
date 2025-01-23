@@ -5,9 +5,9 @@ services:
     build:
       context: .
     ports:
-      - "3000:3000"
+      - "3012:3012"
     environment:
-      - PORT=3000
+      - PORT=3012
     volumes:
       - db-data:/app/backend/db.json
     command: npm run run

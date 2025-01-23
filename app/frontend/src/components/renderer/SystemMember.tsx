@@ -1,8 +1,9 @@
-import { getMouseButtons, Position, TransformProvider, useGlobalTransform, useRelativeDrag, vec2 } from "@alan404/react-workspace";
+import { getMouseButtons, TransformProvider, useRelativeDrag } from "@alan404/react-workspace";
 import { PolyculeSystem, PolyculePerson } from "@app/common";
 import { Stack, Avatar, Text } from "@mantine/core";
 import { GraphNode } from "./types";
 import { useRef } from "react";
+import { vec2, Vec2 } from "@alan404/vec2";
 
 export const SystemMember = ({
     system, member, nodes, onDrag, onDragEnd,
@@ -10,14 +11,13 @@ export const SystemMember = ({
     system: PolyculeSystem;
     member: PolyculePerson;
     nodes: GraphNode[];
-    onDrag: (pos: Position) => void;
+    onDrag: (pos: Vec2) => void;
     onDragEnd: () => void;
 }) => {
     const memberId = `${system.id}-${member.id}`;
     const node = nodes.find(x => x.id == memberId);
 
-    const ref = useRef<HTMLDivElement | null>(null);
-    const { isDragging } = useRelativeDrag(ref, {
+    const { isDragging, props } = useRelativeDrag({
         onDrag,
         onDragEnd,
         position: vec2(node?.x, node?.y),
@@ -48,7 +48,7 @@ export const SystemMember = ({
                         outline: isDragging ? "solid var(--mantine-color-blue-outline)" : "",
                         outlineOffset: "4px",
                     }}
-                    ref={ref}
+                    {...props}
                 />
                 <Text
                     fz="sm"
